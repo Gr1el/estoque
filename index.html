@@ -145,9 +145,7 @@
         function deleteRow(button) {
             const row = button.parentNode.parentNode;
             productList.deleteRow(row.rowIndex - 1);
-            if (editRowIndex >= 0) {
-                editRowIndex = -1; // Reseta o índice se o produto editado for excluído
-            }
+            editRowIndex = -1; // Reseta o índice se um produto editado for excluído
         }
 
         function editRow(button) {
