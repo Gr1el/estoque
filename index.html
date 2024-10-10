@@ -77,26 +77,22 @@
                 <td>${productName}</td>
                 <td>${productQuantity}</td>
                 <td>
-                    <button onclick="increaseQuantity(this)">Entrada</button>
-                    <button onclick="decreaseQuantity(this)">Saída</button>
+                    <button onclick="adjustQuantity(this, 1)">Entrada</button>
+                    <button onclick="adjustQuantity(this, -1)">Saída</button>
                 </td>
             `;
 
             form.reset();
         });
 
-        function increaseQuantity(button) {
-            const row = button.parentNode.parentNode;
-            const quantityCell = row.cells[1];
-            quantityCell.innerText = parseInt(quantityCell.innerText) + 1;
-        }
-
-        function decreaseQuantity(button) {
+        function adjustQuantity(button, change) {
             const row = button.parentNode.parentNode;
             const quantityCell = row.cells[1];
             const currentQuantity = parseInt(quantityCell.innerText);
-            if (currentQuantity > 0) {
-                quantityCell.innerText = currentQuantity - 1;
+            const newQuantity = currentQuantity + change;
+
+            if (newQuantity >= 0) {
+                quantityCell.innerText = newQuantity;
             } else {
                 alert('Quantidade não pode ser menor que zero.');
             }
