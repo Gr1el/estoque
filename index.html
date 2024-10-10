@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Estoque</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            margin-right: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .delete {
+            background-color: #dc3545;
+        }
+        .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerenciador de Estoque</h1>
+    
+    <form id="product-form">
+        <input type="text" id="product-name" placeholder="Nome do Produto" required>
+        <input type="number" id="product-quantity" placeholder="Quantidade" required>
+        <input type="number" id="product-price" placeholder="Preço" required>
+        <button type="submit">Adicionar Produto</button>
+    </form>
+
+    <h2>Produtos</h2>
+    <table id="product-list">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Quantidade</th>
+                <th>Preço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Os produtos serão adicionados aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById('product-form');
+        const productList = document.getElementById('product-list').getElementsByTagName('tbody')[0];
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const productName = document.getElementById('product-name').value;
+            const productQuantity = document.getElementById('product-quantity').value;
+            const productPrice = document.getElementById('product-price').value;
+
+            const newRow = productList.insertRow();
+            newRow.innerHTML = `
+                <td>${productName}</td>
+                <td>${productQuantity}</td>
+                <td>R$ ${parseFloat(productPrice).toFixed(2)}</td>
+                <td><button class="delete" onclick="deleteRow(this)">Excluir</button></td>
+            `;
+
+            form.reset();
+        });
+
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            productList.deleteRow(row.rowIndex - 1);
+        }
+    </script>
+</body>
+</html>
