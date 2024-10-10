@@ -3,91 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Estoque</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Catálogo de Produtos</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
+            font-family: Arial, sans-serif;
             padding: 20px;
+            background-color: #f4f4f4;
         }
-        header {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
+        h1 {
             text-align: center;
-            border-radius: 8px;
-        }
-        h1, h2 {
-            color: #333;
         }
         form {
             margin-bottom: 20px;
-            background: white;
             padding: 20px;
-            border-radius: 8px;
+            background: white;
+            border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        input {
-            margin-right: 10px;
+        input, button {
+            margin: 5px;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 30%;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #218838;
+            width: 20%;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         th, td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
         }
-        th {
-            background-color: #f8f9fa;
-        }
-        .delete {
-            background-color: #dc3545;
-        }
-        .delete:hover {
-            background-color: #c82333;
-        }
-        .edit {
-            background-color: #ffc107;
-        }
-        .edit:hover {
-            background-color: #e0a800;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Gerenciador de Estoque</h1>
-    </header>
-    
+
+    <h1>Catálogo de Produtos</h1>
+
     <form id="product-form">
         <input type="text" id="product-name" placeholder="Nome do Produto" required>
         <input type="number" id="product-quantity" placeholder="Quantidade" required>
-        <input type="number" id="product-price" placeholder="Preço" required>
         <button type="submit">Adicionar Produto</button>
     </form>
 
@@ -97,7 +54,6 @@
             <tr>
                 <th>Nome</th>
                 <th>Quantidade</th>
-                <th>Preço</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -109,87 +65,43 @@
     <script>
         const form = document.getElementById('product-form');
         const productList = document.getElementById('product-list').getElementsByTagName('tbody')[0];
-        let editRowIndex = -1;
-
-        // Carregar produtos do Local Storage ao iniciar
-        document.addEventListener('DOMContentLoaded', loadProducts);
 
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
             const productName = document.getElementById('product-name').value;
             const productQuantity = document.getElementById('product-quantity').value;
-            const productPrice = document.getElementById('product-price').value;
 
-            if (editRowIndex >= 0) {
-                // Editar produto existente
-                const row = productList.rows[editRowIndex];
-                row.cells[0].innerText = productName;
-                row.cells[1].innerText = productQuantity;
-                row.cells[2].innerText = `R$ ${parseFloat(productPrice).toFixed(2)}`;
-                updateLocalStorage(); // Atualiza o Local Storage
-                editRowIndex = -1; // Reseta o índice após edição
-            } else {
-                // Adicionar novo produto
-                const newRow = productList.insertRow();
-                newRow.innerHTML = `
-                    <td>${productName}</td>
-                    <td>${productQuantity}</td>
-                    <td>R$ ${parseFloat(productPrice).toFixed(2)}</td>
-                    <td>
-                        <button class="edit" onclick="editRow(this)">Editar</button>
-                        <button class="delete" onclick="deleteRow(this)">Excluir</button>
-                    </td>
-                `;
-                updateLocalStorage(); // Atualiza o Local Storage
-            }
+            const newRow = productList.insertRow();
+            newRow.innerHTML = `
+                <td>${productName}</td>
+                <td>${productQuantity}</td>
+                <td>
+                    <button onclick="increaseQuantity(this)">Entrada</button>
+                    <button onclick="decreaseQuantity(this)">Saída</button>
+                </td>
+            `;
 
             form.reset();
         });
 
-        function deleteRow(button) {
+        function increaseQuantity(button) {
             const row = button.parentNode.parentNode;
-            productList.deleteRow(row.rowIndex - 1);
-            updateLocalStorage(); // Atualiza o Local Storage
+            const quantityCell = row.cells[1];
+            quantityCell.innerText = parseInt(quantityCell.innerText) + 1;
         }
 
-        function editRow(button) {
+        function decreaseQuantity(button) {
             const row = button.parentNode.parentNode;
-            document.getElementById('product-name').value = row.cells[0].innerText;
-            document.getElementById('product-quantity').value = row.cells[1].innerText;
-            document.getElementById('product-price').value = row.cells[2].innerText.replace('R$ ', '');
-            editRowIndex = row.rowIndex - 1; // Ajuste para o índice correto
-        }
-
-        function updateLocalStorage() {
-            const products = [];
-            for (let i = 0; i < productList.rows.length; i++) {
-                const row = productList.rows[i];
-                const product = {
-                    name: row.cells[0].innerText,
-                    quantity: row.cells[1].innerText,
-                    price: row.cells[2].innerText.replace('R$ ', '')
-                };
-                products.push(product);
+            const quantityCell = row.cells[1];
+            const currentQuantity = parseInt(quantityCell.innerText);
+            if (currentQuantity > 0) {
+                quantityCell.innerText = currentQuantity - 1;
+            } else {
+                alert('Quantidade não pode ser menor que zero.');
             }
-            localStorage.setItem('products', JSON.stringify(products));
-        }
-
-        function loadProducts() {
-            const products = JSON.parse(localStorage.getItem('products')) || [];
-            products.forEach(product => {
-                const newRow = productList.insertRow();
-                newRow.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.quantity}</td>
-                    <td>R$ ${parseFloat(product.price).toFixed(2)}</td>
-                    <td>
-                        <button class="edit" onclick="editRow(this)">Editar</button>
-                        <button class="delete" onclick="deleteRow(this)">Excluir</button>
-                    </td>
-                `;
-            });
         }
     </script>
+
 </body>
 </html>
