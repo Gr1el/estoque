@@ -111,6 +111,9 @@
         const productList = document.getElementById('product-list').getElementsByTagName('tbody')[0];
         let editRowIndex = -1;
 
+        // Carregar produtos do Local Storage ao iniciar
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -124,6 +127,7 @@
                 row.cells[0].innerText = productName;
                 row.cells[1].innerText = productQuantity;
                 row.cells[2].innerText = `R$ ${parseFloat(productPrice).toFixed(2)}`;
+                updateLocalStorage(); // Atualiza o Local Storage
                 editRowIndex = -1; // Reseta o índice após edição
             } else {
                 // Adicionar novo produto
@@ -137,6 +141,7 @@
                         <button class="delete" onclick="deleteRow(this)">Excluir</button>
                     </td>
                 `;
+                updateLocalStorage(); // Atualiza o Local Storage
             }
 
             form.reset();
@@ -145,7 +150,7 @@
         function deleteRow(button) {
             const row = button.parentNode.parentNode;
             productList.deleteRow(row.rowIndex - 1);
-            editRowIndex = -1; // Reseta o índice se um produto editado for excluído
+            updateLocalStorage(); // Atualiza o Local Storage
         }
 
         function editRow(button) {
@@ -154,6 +159,36 @@
             document.getElementById('product-quantity').value = row.cells[1].innerText;
             document.getElementById('product-price').value = row.cells[2].innerText.replace('R$ ', '');
             editRowIndex = row.rowIndex - 1; // Ajuste para o índice correto
+        }
+
+        function updateLocalStorage() {
+            const products = [];
+            for (let i = 0; i < productList.rows.length; i++) {
+                const row = productList.rows[i];
+                const product = {
+                    name: row.cells[0].innerText,
+                    quantity: row.cells[1].innerText,
+                    price: row.cells[2].innerText.replace('R$ ', '')
+                };
+                products.push(product);
+            }
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        function loadProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            products.forEach(product => {
+                const newRow = productList.insertRow();
+                newRow.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>R$ ${parseFloat(product.price).toFixed(2)}</td>
+                    <td>
+                        <button class="edit" onclick="editRow(this)">Editar</button>
+                        <button class="delete" onclick="deleteRow(this)">Excluir</button>
+                    </td>
+                `;
+            });
         }
     </script>
 </body>
